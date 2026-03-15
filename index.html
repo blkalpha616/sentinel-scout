@@ -5,57 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentinel Scout v2.0</title>
     <style>
-        body { background-color: #0a0a0a; color: #00ff00; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .container { border: 2px solid #00ff00; padding: 2rem; border-radius: 10px; box-shadow: 0 0 20px #00ff00; text-align: center; width: 85%; max-width: 600px; }
-        input { width: 90%; padding: 12px; margin: 15px 0; background: #1a1a1a; border: 1px solid #00ff00; color: #00ff00; outline: none; font-family: inherit; }
-        button { background: #00ff00; color: #000; border: none; padding: 12px 24px; cursor: pointer; font-weight: bold; font-family: inherit; text-transform: uppercase; }
-        button:hover { background: #00cc00; box-shadow: 0 0 10px #00ff00; }
-        #status { margin-top: 25px; padding: 15px; border-top: 1px solid #333; min-height: 100px; white-space: pre-wrap; font-size: 0.9rem; text-align: left; }
-        .glitch { font-size: 1.8rem; text-shadow: 2px 2px #004400; margin-bottom: 0.5rem; }
+        body { background-color: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .scanner-box { border: 1px solid #00ff41; padding: 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); width: 100%; max-width: 500px; text-align: center; }
+        h1 { font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 20px; color: #fff; text-shadow: 0 0 5px #00ff41; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; background: #111; border: 1px solid #00ff41; color: #00ff41; box-sizing: border-box; outline: none; }
+        button { background: #00ff41; color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        #output { margin-top: 25px; text-align: left; font-size: 0.9rem; line-height: 1.4; border-top: 1px dashed #333; padding-top: 15px; min-height: 50px; }
+        .loading { color: #ffff00; font-style: italic; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="glitch">SENTINEL SCOUT v2.0</div>
-        <p><i>Awaiting your command, My Lord.</i></p>
-        
-        <input type="text" id="videoUrl" placeholder="PASTE TARGET URL HERE...">
-        <br>
-        <button onclick="initiateScan()">Initiate Intercept</button>
-        
-        <div id="status">STATUS: Systems Nominal. Bridge standing by.</div>
-    </div>
 
-    <script>
-        // --- THE BRIDGE PROTOCOL ---
-        // My Lord, update this address whenever the Alienware terminal gives you a new one.
-        const bridgeUrl = "https://britain-bags-panels-actions.trycloudflare.com";
+<div class="scanner-box">
+    <h1>SENTINEL INTERCEPTOR</h1>
+    <p style="font-size: 0.8rem; margin-bottom: 20px;">READY FOR DEPLOYMENT, MY LORD.</p>
+    
+    <input type="text" id="targetUrl" placeholder="PASTE TRANSMISSION URL...">
+    <button onclick="runScan()">Initiate Intercept</button>
 
-        async function initiateScan() {
-            const urlInput = document.getElementById('videoUrl').value;
-            const statusDiv = document.getElementById('status');
+    <div id="output">SYSTEM STATUS: NOMINAL</div>
+</div>
 
-            if (!urlInput) {
-                statusDiv.innerHTML = "<span style='color: #ff0000;'>CRITICAL: No target coordinates provided, My Lord.</span>";
-                return;
-            }
+<script>
+    // --- THE SACRED BRIDGE ---
+    // Update this link whenever you restart sc_controller.py
+    const bridge = "https://wrestling-checklist-submitted-myers.trycloudflare.com/scan";
 
-            statusDiv.innerText = "TRANSMISSION: Routing through Cloudflare to Alienware...";
+    async function runScan() {
+        const url = document.getElementById('targetUrl').value;
+        const output = document.getElementById('output');
 
-            try {
-                // Testing the link provided in Image 2ab82cb5
-                const response = await fetch(`${bridgeUrl}/scan?url=${encodeURIComponent(urlInput)}`);
-                
-                if (!response.ok) throw new Error("Bridge Refused Connection");
-                
-                const data = await response.json();
-                
-                statusDiv.innerHTML = `<strong>VERDICT RENDERED:</strong>\n\n${data.analysis}`;
-            } catch (err) {
-                statusDiv.innerHTML = `<span style='color: #ff0000;'>ERROR: The Bridge is broken.</span>\n\nEnsure the address in the script matches the [MISSION CRITICAL] link on your Alienware, My Lord.`;
-                console.error("Intercept Failed:", err);
-            }
+        if (!url) {
+            output.innerHTML = "<span style='color: #ff3333;'>ERROR: NO COORDINATES DETECTED.</span>";
+            return;
         }
-    </script>
+
+        output.innerHTML = "<span class='loading'>TRANSMITTING TO ALIENWARE... PLEASE WAIT.</span>";
+
+        try {
+            const response = await fetch(`${bridge}?url=${encodeURIComponent(url)}`);
+            const data = await response.json();
+            
+            output.innerHTML = `<strong style="color: #fff;">ANALYSIS COMPLETE:</strong><br><br>${data.analysis}`;
+        } catch (err) {
+            output.innerHTML = "<span style='color: #ff3333;'>CRITICAL ERROR: THE BRAIN IS UNREACHABLE.</span><br><br>Check the bridge link in Line 35, My Lord.";
+        }
+    }
+</script>
+
 </body>
 </html>
