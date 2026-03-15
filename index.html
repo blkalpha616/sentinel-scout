@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Global Command</title>
+    <style>
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { width: 90%; max-width: 400px; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 20px #00ff41; border-radius: 10px; }
+        h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
+        input { width: 100%; padding: 12px; background: #111; border: 1px solid #00ff41; color: #00ff41; margin: 20px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #00ff41; color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #008f11; color: #fff; }
+        #status { margin-top: 20px; font-size: 0.9rem; white-space: pre-wrap; color: #00ff41; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentinel V1.0</h1>
+        <p>SYSTEM STATUS: ONLINE</p>
+        <input type="text" id="videoUrl" placeholder="PASTE VIDEO URL HERE...">
+        <button onclick="sendToBrain()">INITIATE SCAN</button>
+        <div id="status">Ready for input, My Lord...</div>
+    </div>
+
+    <script>
+        async function sendToBrain() {
+            const urlInput = document.getElementById('videoUrl').value;
+            const statusDiv = document.getElementById('status');
+            
+            if(!urlInput) { statusDiv.innerText = "Error: No URL detected."; return; }
+
+            statusDiv.innerText = "Transmission sent to Alienware...";
+            
+            // This is your permanent global address
+            const endpoint = `https://apparitional-mozelle-obsessively.ngrok-free.app/scan?url=${encodeURIComponent(urlInput)}`;
+
+            try {
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                statusDiv.innerText = `VERDICT: ${data.verdict}\nSCORE: ${data.score}%\nMESSAGE: ${data.detail}`;
+            } catch (err) {
+                statusDiv.innerText = "CRITICAL ERROR: The Brain is currently offline or unreachable.";
+            }
+        }
+    </script>
+</body>
+</html>
