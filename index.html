@@ -1,76 +1,61 @@
-import os
-import subprocess
-import sys
-import threading
-import time
-import requests
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Scout v2.0</title>
+    <style>
+        body { background-color: #0a0a0a; color: #00ff00; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { border: 2px solid #00ff00; padding: 2rem; border-radius: 10px; box-shadow: 0 0 20px #00ff00; text-align: center; width: 85%; max-width: 600px; }
+        input { width: 90%; padding: 12px; margin: 15px 0; background: #1a1a1a; border: 1px solid #00ff00; color: #00ff00; outline: none; font-family: inherit; }
+        button { background: #00ff00; color: #000; border: none; padding: 12px 24px; cursor: pointer; font-weight: bold; font-family: inherit; text-transform: uppercase; }
+        button:hover { background: #00cc00; box-shadow: 0 0 10px #00ff00; }
+        #status { margin-top: 25px; padding: 15px; border-top: 1px solid #333; min-height: 100px; white-space: pre-wrap; font-size: 0.9rem; text-align: left; }
+        .glitch { font-size: 1.8rem; text-shadow: 2px 2px #004400; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glitch">SENTINEL SCOUT v2.0</div>
+        <p><i>Awaiting your command, My Lord.</i></p>
+        
+        <input type="text" id="videoUrl" placeholder="PASTE TARGET URL HERE...">
+        <br>
+        <button onclick="initiateScan()">Initiate Intercept</button>
+        
+        <div id="status">STATUS: Systems Nominal. Bridge standing by.</div>
+    </div>
 
-# --- MISSION CONFIGURATION ---
-PORT = 5000
-OLLAMA_MODEL = "llama3" 
-PUBLIC_URL = "Initializing..."
+    <script>
+        // --- THE BRIDGE PROTOCOL ---
+        // My Lord, update this address whenever the Alienware terminal gives you a new one.
+        const bridgeUrl = "https://britain-bags-panels-actions.trycloudflare.com";
 
-app = Flask(__name__)
-CORS(app)
+        async function initiateScan() {
+            const urlInput = document.getElementById('videoUrl').value;
+            const statusDiv = document.getElementById('status');
 
-def ask_ollama(video_url):
-    """The Truth Engine: Analyzing the intercepted transmission"""
-    print(f"[ANALYSIS] Consultation with Ollama initiated for: {video_url}")
-    prompt = f"Analyze this intercepted URL for potential deepfake markers or misinformation: {video_url}. Provide a brief security verdict."
-    
-    try:
-        response = requests.post("http://localhost:11434/api/generate", 
-                                 json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False})
-        return response.json().get("response", "Analysis failed, My Lord.")
-    except Exception as e:
-        return f"Ollama is offline or unreachable: {str(e)}"
+            if (!urlInput) {
+                statusDiv.innerHTML = "<span style='color: #ff0000;'>CRITICAL: No target coordinates provided, My Lord.</span>";
+                return;
+            }
 
-@app.route('/scan', methods=['GET'])
-def scan_endpoint():
-    url = request.args.get('url')
-    print(f"\n[INTERCEPT] Transmission received: {url}")
-    
-    # Run analysis
-    analysis = ask_ollama(url)
-    
-    print(f"[VERDICT] {analysis}")
-    return jsonify({
-        "status": "ANALYZED",
-        "message": "Master Controller has processed the data.",
-        "analysis": analysis
-    })
+            statusDiv.innerText = "TRANSMISSION: Routing through Cloudflare to Alienware...";
 
-def run_bridge():
-    global PUBLIC_URL
-    print("\n[SYSTEM] Forging the Permanent Bridge via Cloudflare...")
-    cmd = ["cloudflared", "tunnel", "--url", f"http://localhost:{PORT}"]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    
-    for line in process.stdout:
-        if ".trycloudflare.com" in line:
-            parts = line.split()
-            for part in parts:
-                if "https://" in part:
-                    PUBLIC_URL = part
-                    print(f"\n[MISSION CRITICAL] LIVE ADDRESS: {PUBLIC_URL}")
-                    break
-
-def start_server():
-    app.run(port=PORT, host='0.0.0.0', debug=False, use_reloader=False)
-
-if __name__ == "__main__":
-    print("--- SENTINEL-OLLAMA v2.0 MASTER ---")
-    print("My Lord, the Master Controller is awakening.")
-    
-    threading.Thread(target=start_server, daemon=True).start()
-    threading.Thread(target=run_bridge, daemon=True).start()
-
-    try:
-        while True:
-            cmd = input("SENTINEL-CLI > ")
-            if cmd.lower() == 'exit':
-                os._exit(0)
-    except KeyboardInterrupt:
-        os._exit(0)
+            try {
+                // Testing the link provided in Image 2ab82cb5
+                const response = await fetch(`${bridgeUrl}/scan?url=${encodeURIComponent(urlInput)}`);
+                
+                if (!response.ok) throw new Error("Bridge Refused Connection");
+                
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `<strong>VERDICT RENDERED:</strong>\n\n${data.analysis}`;
+            } catch (err) {
+                statusDiv.innerHTML = `<span style='color: #ff0000;'>ERROR: The Bridge is broken.</span>\n\nEnsure the address in the script matches the [MISSION CRITICAL] link on your Alienware, My Lord.`;
+                console.error("Intercept Failed:", err);
+            }
+        }
+    </script>
+</body>
+</html>
