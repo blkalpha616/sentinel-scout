@@ -1,48 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel Global Command</title>
-    <style>
-        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .container { width: 90%; max-width: 400px; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 20px #00ff41; border-radius: 10px; text-align: center; }
-        h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
-        input { width: 100%; padding: 12px; background: #111; border: 1px solid #00ff41; color: #00ff41; margin: 20px 0; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #00ff41; color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; width: 100%; }
-        #status { margin-top: 20px; font-size: 0.9rem; white-space: pre-wrap; color: #00ff41; border-top: 1px dashed #00ff41; padding-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>SENTINEL V1.0</h1>
-        <p>GATEWAY: ACTIVE</p>
-        <input type="text" id="videoUrl" placeholder="PASTE VIDEO URL HERE...">
-        <button onclick="sendToBrain()">INITIATE SCAN</button>
-        <div id="status">Awaiting your command, My Lord...</div>
-    </div>
+import os
+import subprocess
+import sys
+import threading
+import time
+import requests  # Added for Ollama communication
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
-    <script>
-        async function sendToBrain() {
-            const urlInput = document.getElementById('videoUrl').value;
-            const statusDiv = document.getElementById('status');
-            
-            if(!urlInput) { statusDiv.innerText = "Error: No URL detected."; return; }
+# --- MISSION CONFIGURATION ---
+PORT = 5000
+OLLAMA_MODEL = "llama3" # You can change this to deepseek-r1 if preferred
+PUBLIC_URL = "Initializing..."
 
-            statusDiv.innerText = "Transmission sent to Alienware...";
-            
-            // Your EXACT bridge address from the terminal
-            const bridge = "https://tourism-acid-championships-copyright.trycloudflare.com/scan";
+app = Flask(__name__)
+CORS(app)
 
-            try {
-                const response = await fetch(`${bridge}?url=${encodeURIComponent(urlInput)}`);
-                const data = await response.json();
-                statusDiv.innerText = `VERDICT: ${data.verdict}\nDETAIL: ${data.detail}`;
-            } catch (err) {
-                statusDiv.innerText = "CRITICAL ERROR: The Brain is currently unreachable, My Lord.";
-                console.error(err);
-            }
-        }
-    </script>
-</body>
-</html>
+def ask_ollama(video_url):
+    """The Truth Engine: Analyzing the intercepted transmission"""
+    print(f"[ANALYSIS] Consultation with Ollama initiated for: {video_url}")
+    prompt = f"Analyze this intercepted URL for potential deepfake markers or misinformation: {video_url}. Provide a brief security verdict."
+    
+    try:
+        response = requests.post("http://localhost:11434/api/generate", 
+                                 json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False})
+        return response.json().get("response", "Analysis failed, My Lord.")
+    except Exception as e:
+        return f"Ollama is offline or unreachable: {str(e)}"
+
+@app.route('/scan', methods=['GET'])
+def scan_endpoint():
+    url = request.args.get('url')
+    print(f"\n[INTERCEPT] Transmission received: {url}")
+    
+    # Run analysis in the background so the Scout doesn't hang
+    analysis = ask_ollama(url)
+    
+    print(f"[VERDICT] {analysis}")
+    return jsonify({
+        "status": "ANALYZED",
+        "message": "Master Controller has processed the data.",
+        "analysis": analysis
+    })
+
+def run_bridge():
+    global PUBLIC_URL
+    print("\n[SYSTEM] Forging the Permanent Bridge via Cloudflare...")
+    # Using the manual command logic to ensure it hooks correctly
+    cmd = ["cloudflared", "tunnel", "--url", f"http://localhost:{PORT}"]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    
+    for line in process.stdout:
+        if ".trycloudflare.com" in line:
+            parts = line.split()
+            for part in parts:
+                if "https://" in part:
+                    PUBLIC_URL = part
+                    print(f"\n[MISSION CRITICAL] LIVE ADDRESS: {PUBLIC_URL}")
+                    break
+
+def start_server():
+    app.run(port=PORT, host='0.0.0.0', debug=False, use_reloader=False)
+
+if __name__ == "__main__":
+    print("--- SENTINEL-OLLAMA v2.0 HYBRID ---")
+    print("My Lord, the Master Controller is awakening with AI integration.")
+    
+    threading.Thread(target=start_server, daemon=True).start()
+    threading.Thread(target=run_bridge, daemon=True).start()
+
+    try:
+        while True:
+            cmd = input("SENTINEL-CLI > ")
+            if cmd.lower() == 'exit':
+                os._exit(0)
+    except KeyboardInterrupt:
+        os._exit(0)
