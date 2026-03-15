@@ -31,15 +31,17 @@
 
             statusDiv.innerText = "Transmission sent to Alienware...";
             
-            // Your dedicated bridge address
-            const bridge = "https://apparitional-mozelle-obsessively.ngrok-free.app/scan";
+            // This is the EXACT bridge from your terminal
+            const bridge = "https://apparitional-mozelle-obsessively.ngrok-free.dev/scan";
 
             try {
                 const response = await fetch(`${bridge}?url=${encodeURIComponent(urlInput)}`);
+                if (!response.ok) throw new Error("Connection Refused");
                 const data = await response.json();
                 statusDiv.innerText = `VERDICT: ${data.verdict}\nDETAIL: ${data.detail}`;
             } catch (err) {
                 statusDiv.innerText = "CRITICAL ERROR: The Brain is currently unreachable, My Lord.";
+                console.error(err);
             }
         }
     </script>
