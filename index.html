@@ -9,7 +9,7 @@
         .container { width: 90%; max-width: 400px; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 20px #00ff41; border-radius: 10px; text-align: center; }
         h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
         input { width: 100%; padding: 12px; background: #111; border: 1px solid #00ff41; color: #00ff41; margin: 20px 0; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #00ff41; color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; width: 100%; }
+        button { width: 100%; padding: 15px; background: #00ff41; color: #000; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
         #status { margin-top: 20px; font-size: 0.9rem; white-space: pre-wrap; color: #00ff41; border-top: 1px dashed #00ff41; padding-top: 10px; }
     </style>
 </head>
@@ -31,7 +31,7 @@
 
             statusDiv.innerText = "Transmission sent to Alienware...";
             
-            // Your EXACT bridge address
+            // This is the bridge to your Alienware terminal
             const bridge = "https://apparitional-mozelle-obsessively.ngrok-free.dev/scan";
 
             try {
@@ -40,7 +40,7 @@
                 statusDiv.innerText = `VERDICT: ${data.verdict}\nDETAIL: ${data.detail}`;
             } catch (err) {
                 statusDiv.innerText = "CRITICAL ERROR: The Brain is currently unreachable, My Lord.";
-                console.error(err);
+                console.error("Connection Failed:", err);
             }
         }
     </script>
