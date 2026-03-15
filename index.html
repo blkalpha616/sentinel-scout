@@ -31,12 +31,11 @@
 
             statusDiv.innerText = "Transmission sent to Alienware...";
             
-            // This is the EXACT bridge from your terminal
+            // Your EXACT bridge address
             const bridge = "https://apparitional-mozelle-obsessively.ngrok-free.dev/scan";
 
             try {
                 const response = await fetch(`${bridge}?url=${encodeURIComponent(urlInput)}`);
-                if (!response.ok) throw new Error("Connection Refused");
                 const data = await response.json();
                 statusDiv.innerText = `VERDICT: ${data.verdict}\nDETAIL: ${data.detail}`;
             } catch (err) {
